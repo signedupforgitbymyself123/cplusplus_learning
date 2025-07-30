@@ -1,7 +1,7 @@
 #include <Arduino.h>
 //#include <esp32-hal-rgb-led.h>
 int sigmadelay=1000;
-int sigmaredvalue=1;
+int sigmaredvalue=10;
 // put function declarations here:
 int RGB_PIN = 48;
 int STRIP_RGB_PIN = 15;
@@ -56,7 +56,7 @@ void colorWipe(uint32_t color, int wait) {
     current_pixel = 0;
     patternComplete = true;
   }
-}
+} 
 
 // Theater-marquee-style chasing lights. Pass in a color (32-bit value,
 // a la strip.Color(r,g,b) as mentioned above), and a delay time (in ms)
@@ -124,6 +124,8 @@ void theaterChaseRainbow(uint8_t wait) {
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200); // Start serial communication
+  //neopixelWrite(STRIP_RGB_PIN,50,50,0);
+ 
 
   Serial.println(" I have started up");
 
@@ -136,15 +138,13 @@ void setup() {
     Serial.println("Connecting...");
     delay(1000);
   }
-  neopixelWrite(STRIP_RGB_PIN,50,0,0);
+  
 
   //IPAddress foo = WiFi.localIP();
   //Serial.println(foo);
 
   Serial.println( WiFi.localIP() );
-  strip.begin();
-  strip.show();            // Turn OFF all pixels ASAP
-  strip.setBrightness(50); // Set BRIGHTNESS to about 1/5 (max = 255)
+  
 
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
 
@@ -226,11 +226,38 @@ void setup() {
 
   server.begin();
 
+   strip.clear();
+  strip.begin();
+  strip.show();            // Turn OFF all pixels ASAP
+  strip.setBrightness(50); // Set BRIGHTNESS to about 1/5 (max = 255)
 
 }
-
-void loop() {
+float arg2=5.5;
+int arg1=10;
+int test_counter = 0;
+void loop2(){
+  unsigned long currentMillis = millis(); 
+  test_counter = test_counter + 1;                    //  Update current time
+  if(  (currentMillis - patternPrevious) >= patternInterval) {  //  Check for expired tim
+    
+  
+    //test_counter++;
+    if( arg1<test_counter){
+      //Serial.print("bob");
+    }
+    if(arg2<test_counter){
+      //colorWipe(strip.Color(0, 255, 0), 500);
+      //theaterChaseRainbow(50); 
+      theaterChase(strip.Color(0, 0, 127), 50); // Blue
+    }
+    else{
+      colorWipe(strip.Color(0, 0, 0), 50);
+    }
+  }
+}
+void loop3() {
   // put your main code here, to run repeatedly:
+ 
   /*
   neopixelWrite(RGB_PIN,sigmaredvalue,green_v,0);
   Serial.printf("waiting %i  red is: %i\n",sigmadelay,sigmaredvalue);
@@ -285,4 +312,23 @@ void loop() {
     }
   }
 }
+
+void loop(){
+  unsigned long currentMillis = millis();                     //  Update current time
+  if( patternComplete || (currentMillis - patternPrevious) >= patternInterval) {  //  Check for expired time
+    patternComplete = false;
+    patternPrevious = currentMillis;
+    patternCurrent++;                                         //  Advance to next pattern
+    if(patternCurrent >= 7)
+      patternCurrent = 0;
+  }
+
+  if(currentMillis - pixelPrevious >= pixelInterval) {        //  Check for expired time
+    pixelPrevious = currentMillis;                            //  Run current frame
+  
+    colorWipe(strip.Color(25, 0, 0), 50); // Red
+       
+  }
+  
+  }
 
