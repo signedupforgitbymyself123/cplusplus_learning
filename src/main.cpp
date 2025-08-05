@@ -15,6 +15,7 @@ int LED_COUNT = 12;
 Adafruit_NeoPixel pixels(LED_COUNT, STRIP_RGB_PIN, NEO_GRB );
 
 int currentPixel = 0;
+uint32_t black_px = Adafruit_NeoPixel::Color(0, 0, 0);
 
 void setup()
 {
@@ -22,6 +23,7 @@ void setup()
   pixels.begin();
   pixels.clear();
   pixels.show();
+  
 }
 
 void singlePixelCircle(uint32_t color, int delayTime)
@@ -30,13 +32,15 @@ void singlePixelCircle(uint32_t color, int delayTime)
 
   
   pixels.setPixelColor(currentPixel, color); // Light up the current pixel
-  pixels.setPixelColor(currentPixel -1, color); // Light up the current pixel
+  pixels.setPixelColor(currentPixel -1, black_px); // Light up the current pixel
   pixels.show();                             // Display the changes
 
   currentPixel++; // Move to the next pixel
   if (currentPixel >= LED_COUNT)
   {
-    currentPixel = 0; // Loop back to the start
+    currentPixel = 0;
+     // Loop back to the 
+     pixels.setPixelColor(11, black_px); // Turn off the last pixel
   }
 
 }
@@ -45,7 +49,7 @@ int pixelPrevious = 0;
 int patternInterval = 100;
 int pixelInterval = 50;
 int patternPrevious = 0;
-uint32_t black_px = Adafruit_NeoPixel::Color(0, 0, 0);
+
 
 void loop()
 {
@@ -68,7 +72,7 @@ void loop()
     // rainbow(10);
     //  colorWipe(pixels.Color(25, 0, 0), 50); // Red
 
-    singlePixelCircle(pixels.Color(100, 10, 0), 100); 
-     singlePixelCircle(black_px, 100); // Red light moving in a circle
+    singlePixelCircle(pixels.Color(0, 10, 100), 100); 
+    //singlePixelCircle(black_px, 100); // Red light moving in a circle
   }
 }
