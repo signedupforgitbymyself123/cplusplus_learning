@@ -19,6 +19,7 @@ uint32_t black_px = Adafruit_NeoPixel::Color(0, 0, 0);
 
 void setup()
 {
+  Serial.begin(115200);
   //rmt_driver_uninstall(RMT_CHANNEL_0);
   pixels.begin();
   pixels.clear();
@@ -26,22 +27,61 @@ void setup()
   
 }
 
+bool forward = true;
+
+//defin do_backward function
+
+void do_backward(uint32_t color){
+
+   // detect pixel 12 and set forward 
+  pixels.setPixelColor(currentPixel, color); // Light up the current pixel
+  pixels.setPixelColor(currentPixel +1, black_px); // Light up the current pixel
+                              // Display the changes
+  if (currentPixel <= 0)
+  {
+     //Serial.printf("changing dir to forward\n");
+     forward = true;
+  }
+
+}
+
+void do_forward(uint32_t color)
+{
+
+  // detect pixel 12 and set forward 
+  pixels.setPixelColor(currentPixel, color); // Light up the current pixel
+  pixels.setPixelColor(currentPixel -1, black_px); // Light up the current pixel
+                              // Display the changes
+
+  // Move to the next pixel
+  if (currentPixel >= LED_COUNT)
+  {
+    //Serial.printf("changing dir to backward\n");
+     forward = false;
+  }
+}
+
+
+
 void singlePixelCircle(uint32_t color, int delayTime)
 {
  
 
   
-  pixels.setPixelColor(currentPixel, color); // Light up the current pixel
-  pixels.setPixelColor(currentPixel -1, black_px); // Light up the current pixel
-  pixels.show();                             // Display the changes
-
-  currentPixel++; // Move to the next pixel
-  if (currentPixel >= LED_COUNT)
-  {
-    currentPixel = 0;
-     // Loop back to the 
-     pixels.setPixelColor(11, black_px); // Turn off the last pixel
+  
+  if( forward == true){
+    //Serial.printf("we do forward %i\n", currentPixel);
+    do_forward(color);
+    currentPixel++; 
   }
+  else{
+    //Serial.printf("we do back %i\n", currentPixel);
+    do_backward(color);
+    currentPixel--; 
+  }
+  pixels.show(); 
+  //Serial.printf(" forward was %s current pixel was : %i\n", forward ? "TRUE" : "FALSE", currentPixel);
+  delay(delayTime); // Wait for a short time before moving to the next pixel
 
 }
 
